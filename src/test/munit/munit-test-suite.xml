@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="munit-test-suite.xml" />
+	<munit:test name="munit-usedwl-file-test" doc:id="25ca9236-2b66-4cf0-9f13-22723c58a6bf" description="Test">
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="dc9ff895-e139-4d82-b8f4-0ddd747d840f" >
+				<munit:attributes value='#[{queryParams: {firstname:"mith", lastname:"sah"}}]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to munitFlow" doc:id="942d7d4c-7c56-4951-bc21-a6f247398961" name="munitFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<logger level="INFO" doc:name="Logger" doc:id="7ce67bca-d84c-4836-9d4b-9f21e7973705" message="#[payload]"/>
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="e27a1396-b6b4-4db0-94d7-3afebc81eb8c" actual="#[payload.message]" expected='#["Welcome to mule mithsah"]' message="Response not found"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="munit-test-assert-that" doc:id="5cc94598-f094-4c41-88af-34b9e2fede31" >
+		<munit:execution >
+			<munit:set-event doc:name="_Set Event" doc:id="cd1536c0-ecc0-4cea-8577-33c8d9e0a6f4">
+				<munit:attributes value='#[{queryParams: {firstname:"mith", lastname:"sah"}}]' />
+			</munit:set-event>
+			<flow-ref doc:name="_Flow-ref to munitFlow" doc:id="91eeb913-f812-4bcb-a417-05ab58232d86" name="munitFlow" />
+		</munit:execution>
+		<munit:validation >
+			<logger level="INFO" doc:name="_Logger" doc:id="f4fd2835-740d-49e8-86a7-62a44fb47d7b" message="#[payload]" />
+			<munit-tools:assert-that doc:name="Assert that" doc:id="ad560fd4-83cb-443d-bbc9-bef9be344c5c" expression="#[payload.message]" is='#[MunitTools::equalTo("Welcome to mule mithsah")]'/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="munit-test-suiteTest" doc:id="a8cba41f-946b-430c-b409-9645dc3a9ba2" >
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="2404818d-c93c-49a2-aa1c-f62d3360dd95" >
+				<munit:attributes value='#[{queryParams: {firstname:"mith", lastname:"sah"}}]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to munitFlow" doc:id="83fc7f90-1a32-47de-9aac-504f15f808e1" name="munitFlow" />
+		</munit:execution>
+		<munit:validation >
+			<logger level="INFO" doc:name="Logger" doc:id="89c5496e-7ae7-455f-84ca-cbaf44ff097b" message="#[payload]" />
+			<munit-tools:assert doc:name="Assert expression" doc:id="a5fac686-5be6-4716-8a7f-2970de061262" >
+				<munit-tools:that ><![CDATA[#[import * from dw::test::Asserts 
+ ---
+payload must equalTo({
+	"message": "Welcome to mule mithsah"
+})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="munit-test-dwl-testcase" doc:id="507c4329-a8b4-4101-bdf0-284ed5705841" >
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="6d4b8890-9d9e-4157-8a08-19125d28e21c" >
+				<munit:attributes value="#[readUrl('classpath://munitdwlFiles/munit_input_attributes.dwl')]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to munitFlow" doc:id="5bb2bf60-18c2-4d77-a6e0-a13aad987d3d" name="munitFlow" />
+		</munit:execution>
+		<munit:validation >
+			<logger level="INFO" doc:name="Logger" doc:id="47280e33-194b-47cd-b6c3-d603b4872976" message="#[payload]" />
+			<munit-tools:assert doc:name="Assert expression" doc:id="f00f0592-f69f-4c27-abd2-961c02858b3a" message="payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import munitdwlFiles::munit_response
+---
+munit_response::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>
